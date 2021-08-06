@@ -1,28 +1,40 @@
 import os
 import torch
 import time
+from . import LossCounter
 
 
 class Optimizer:
 
-    def __init__(self, model, device, config, start_epoch=0):
-        self.config = config
-        self.start_epoch = start_epoch
-
-        self.base_dir = config.folder
+    def __init__(self, model,
+                 device,
+                 optimizer,
+                 scheduler,
+                 base_dir,
+                 num_epochs=100,
+                 model_file=None,
+                 log_path=None,
+                 verbose=True,
+                 verbose_step=100):
+        self.model = model
+        self.device = device
+        self.model.to(device)
+        self.optimizer = optimizer
+        self.scheduler = scheduler
+        self.num_epochs = num_epochs
+        self.base_dir = base_dir
+        self.verbose = verbose
+        self.verbose_step = verbose_step
+        if model_file:
+            self.load(model_file)
+        else:
+            self.start_epoch = 0
+            self.best_summary_loss = []
         if not os.path.exists(self.base_dir):
             os.makedirs(self.base_dir)
 
-        self.log_path = f"{self.base_dir}/log.csv"
-        self.best_summary_loss = []
-
-        self.model = model
-        self.device = device
-
-        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=config.lr,
-                                           weight_decay=4e-5)
-        self.scheduler = config.SchedulerClass(self.optimizer, **config.scheduler_params)
-        self.log(f'Fitter prepared. Device is {self.device}')
+        self.log_path = log_path if log_path else f"{self.base_dir}/log.csv"
+        print(f'Fitter prepared. Device is {self.device}')
 
     def _start_csv(self):
         self.log("Epoch, Stage, Summary Loss, Class Loss, Box Loss\n", print_line=False)
@@ -41,10 +53,7 @@ class Optimizer:
                f"{summary_loss.box_loss.avg:.5f},"
 
     def fit(self, train_loader, validation_loader):
-        if self.start_epoch > 0 and not self.best_summary_loss:
-            self.best_summary_loss = self.validate(validation_loader)
-
-        for epoch in range(self.start_epoch, self.config.n_epochs):
+        for epoch in range(self.start_epoch, self.num_epochs):
             summary_loss = self.train(train_loader)
 
             self.log(self._log_line(summary_loss, epoch, "Train"))
@@ -64,15 +73,21 @@ class Optimizer:
                 os.remove(f'{self.base_dir}/best-checkpoint-{str(old_epoch).zfill(3)}epoch.bin')
                 self.best_summary_loss.sort()
 
-            if self.config.validation_scheduler:
-                self.scheduler.step()
+            self.scheduler.step()
 
     def validate(self, val_loader):
+        """
+        Evaluates model on validation data after one epoch of training.
+
+        :param val_loader: Data Loader for validation data.
+        :type val_loader: torch.utils.data.DataLoader
+        :return Total Loss on validation data.
+        """
         self.model.eval()
-        summary_loss = LossMeter()
+        summary_loss = LossCounter()
         t = time.time()
         for step, (images, targets) in enumerate(val_loader):
-            if self.config.verbose and step % self.config.verbose_step == 0:
+            if self.verbose and step % self.verbose_step == 0:
                 self._print_line(summary_loss, step, len(val_loader), "Val", t)
             with torch.no_grad():
                 images = torch.stack(images)
@@ -89,11 +104,17 @@ class Optimizer:
         return summary_loss
 
     def train(self, train_loader):
+        """
+        Trains model for one epoch.
+        :param train_loader: Data Loader for training data
+        :type train_loader: torch.utils.data.DataLoader
+        :return: Total Loss on training data for epoch.
+        """
         self.model.train()
-        summary_loss = LossMeter()
+        summary_loss = LossCounter()
         t = time.time()
         for step, (images, targets) in enumerate(train_loader):
-            if self.config.verbose and step % self.config.verbose_step == 0:
+            if self.verbose and step % self.verbose_step == 0:
                 self._print_line(summary_loss, step, len(train_loader), "Train", t)
 
             images = torch.stack(images)
@@ -111,9 +132,6 @@ class Optimizer:
             summary_loss.update(output, batch_size)
 
             self.optimizer.step()
-
-            if self.config.step_scheduler:
-                self.scheduler.step()
 
         return summary_loss
 
