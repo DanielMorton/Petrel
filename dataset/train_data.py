@@ -27,13 +27,13 @@ class TrainDataset(PetrelDataset):
                                         bboxes=target["bboxes"],
                                         labels=target["labels"])
                 if len(sample["bboxes"]) > 0:
-                    image, target["bboxes"] = sample["image"], self._box_to_tensor(sample)
+                    image, target["bboxes"] = sample["image"], self._box_to_tensor(sample["bboxes"])
                     target["labels"] = torch.tensor(sample["labels"])
                     return image, target
         if self.default_transform:
             sample = self.transform(image=image,
                                     bboxes=target["bboxes"],
                                     labels=target["labels"])
-            image, target["bboxes"] = sample["image"], self._box_to_tensor(sample)
+            image, target["bboxes"] = sample["image"], self._box_to_tensor(sample["bboxes"])
             target["labels"] = torch.tensor(sample["labels"])
             return image, target

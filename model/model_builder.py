@@ -8,7 +8,6 @@ class ModelTrainer:
     """
     Class to train object detection models
     """
-
     def __init__(self, model,
                  device,
                  optimizer,
