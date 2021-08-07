@@ -5,6 +5,14 @@ def load_optimizer(opt_type,
                    model,
                    learning_rate,
                    **kwargs):
+    """
+    Returns the optimizer for model training.
+    :param opt_type: Returns the
+    :param model: The model to be trained.
+    :param learning_rate: Initial learning rate.
+    :param kwargs:
+    :return:
+    """
     if opt_type.lower() == "adam":
         return torch.optim.Adam(model.parameters(),
                                 lr=learning_rate)
