@@ -14,7 +14,6 @@ class PetrelDataset(Dataset, ABC):
                  transform=None,
                  train_pipe=False):
         """
-
         :param meta_data: DataFrame consisting of metadata for dataset. Must be one row per datapoint.
         :param boxes: DataFrame consisting of all bounding box data for dataset. Must be in PASCAL VOC format, with
         xmin, ymin, xmax, ymax in separate columns. Must also include numeric label column.
