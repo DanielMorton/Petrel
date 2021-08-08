@@ -11,6 +11,7 @@ class AvgCounter:
         self._sum = 0
         self._count = 0
 
+    @property
     def avg(self):
         """
         Returns the current average.
@@ -76,14 +77,14 @@ class LossCounter:
         Returns the average value of the main loss counter.
         :return: The average value of the main loss counter.
         """
-        return self._loss.avg()
+        return self._loss.avg
 
     def box_avg(self):
         """
         Return the average value of the bounding box loss counter.
         :return: The average value of the bounding box loss counter.
         """
-        return self._box_loss.avg()
+        return self._box_loss.avg
 
     def box_loss(self):
         """
@@ -97,7 +98,7 @@ class LossCounter:
         Returns the average value of the class loss counter.
         :return: The average value of the class loss counter.
         """
-        return self._class_loss.avg()
+        return self._class_loss.avg
 
     def class_loss(self):
         """

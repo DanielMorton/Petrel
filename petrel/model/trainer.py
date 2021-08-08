@@ -72,9 +72,9 @@ class ModelTrainer:
         """
         print(
             f"{stage} Step {step}/{total_steps}, " +
-            f"summary_loss: {summary_loss.avg():.5f}, " +
-            f"class_loss: {summary_loss.class_avg():.5f}, " +
-            f"box_loss: {summary_loss.box_avg():.5f}, " +
+            f"summary_loss: {summary_loss.avg:.5f}, " +
+            f"class_loss: {summary_loss.class_avg:.5f}, " +
+            f"box_loss: {summary_loss.box_avg:.5f}, " +
             f"time: {(time.time() - t):.5f}")
 
     def _csv_line(self, summary_loss, epoch, stage):
@@ -86,9 +86,9 @@ class ModelTrainer:
         :param stage: Training or Validation
         :return: String to write to log file.
         """
-        return f"{epoch}, {stage}, {summary_loss.avg():.5f}," + \
-               f"{summary_loss.class_avg():.5f}," + \
-               f"{summary_loss.box_avg():.5f},"
+        return f"{epoch}, {stage}, {summary_loss.avg:.5f}," + \
+               f"{summary_loss.class_avg:.5f}," + \
+               f"{summary_loss.box_avg:.5f},"
 
     def fit(self, train_loader, validation_loader):
         """
@@ -112,12 +112,12 @@ class ModelTrainer:
 
             # Update list of saved models
             if len(self.best_summary_loss) < self.keep_models:
-                self.best_summary_loss.append((summary_loss.avg(), epoch))
+                self.best_summary_loss.append((summary_loss.avg, epoch))
                 self.save(f'{self.base_dir}/best-checkpoint-{str(epoch).zfill(3)}epoch.bin', epoch)
                 self.best_summary_loss.sort()
-            elif summary_loss.avg() < self.best_summary_loss[-1][0]:
+            elif summary_loss.avg < self.best_summary_loss[-1][0]:
                 _, old_epoch = self.best_summary_loss.pop()
-                self.best_summary_loss.append((summary_loss.avg(), epoch))
+                self.best_summary_loss.append((summary_loss.avg, epoch))
                 self.save(f'{self.base_dir}/best-checkpoint-{str(epoch).zfill(3)}epoch.bin', epoch)
                 os.remove(f'{self.base_dir}/best-checkpoint-{str(old_epoch).zfill(3)}epoch.bin')
                 self.best_summary_loss.sort()
