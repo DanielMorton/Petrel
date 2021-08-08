@@ -123,7 +123,8 @@ class ModelTrainer:
                 self.best_summary_loss.sort()
 
             # Update learning rate.
-            self.scheduler.step()
+            if self.scheduler:
+                self.scheduler.step()
 
     def validate(self, val_loader):
         """
