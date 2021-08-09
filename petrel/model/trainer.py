@@ -1,7 +1,7 @@
 import os
 import torch
 import time
-from . import LossCounter
+from .loss import LossCounter
 
 
 class ModelTrainer:
@@ -60,7 +60,8 @@ class ModelTrainer:
         """
         self.log("Epoch, Stage, Summary Loss, Class Loss, Box Loss", print_line=False)
 
-    def _print_line(self, summary_loss, step, total_steps, stage, t):
+    @staticmethod
+    def _print_line(summary_loss, step, total_steps, stage, t):
         """
         Prints a line of output showing the current status of training.
 
@@ -77,11 +78,12 @@ class ModelTrainer:
             f"box_loss: {summary_loss.box_avg:.5f}, " +
             f"time: {(time.time() - t):.5f}")
 
-    def _csv_line(self, summary_loss, epoch, stage):
+    @staticmethod
+    def _csv_line(summary_loss, epoch, stage):
         """
         Builds the string for one line of logging to csv file.
 
-        :param summary_loss: Totol current loss
+        :param summary_loss: Total current loss
         :param epoch: Current epoch
         :param stage: Training or Validation
         :return: String to write to log file.
