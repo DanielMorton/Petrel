@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/DanielMorton/Petrel/tree/master.svg?style=svg)](https://circleci.com/gh/DanielMorton/Petrel/tree/master)
+
 # Petrel
 Code to streamline Pytorch EfficientDet applications
 
