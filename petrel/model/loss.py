@@ -11,6 +11,7 @@ class LossCounter:
         self._class_loss = AvgCounter()
         self._box_loss = AvgCounter()
 
+    @property
     def avg(self):
         """
         Returns the average value of the main loss counter.
@@ -18,6 +19,7 @@ class LossCounter:
         """
         return self._loss.avg
 
+    @property
     def box_avg(self):
         """
         Return the average value of the bounding box loss counter.
@@ -25,6 +27,7 @@ class LossCounter:
         """
         return self._box_loss.avg
 
+    @property
     def box_loss(self):
         """
         Returns the bounding box loss counter.
@@ -32,6 +35,7 @@ class LossCounter:
         """
         return self._box_loss
 
+    @property
     def class_avg(self):
         """
         Returns the average value of the class loss counter.
@@ -39,6 +43,7 @@ class LossCounter:
         """
         return self._class_loss.avg
 
+    @property
     def class_loss(self):
         """
         Returns the class loss counter.
@@ -46,6 +51,7 @@ class LossCounter:
         """
         return self._class_loss
 
+    @property
     def loss(self):
         """
         Returns the total loss counter.
