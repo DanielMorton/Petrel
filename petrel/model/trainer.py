@@ -9,10 +9,10 @@ class ModelTrainer:
     Class to train object detection models
     """
     def __init__(self, model,
-                 device,
                  optimizer,
                  scheduler,
                  base_dir,
+                 device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
                  num_epochs=100,
                  model_file=None,
                  log_path=None,
@@ -140,7 +140,7 @@ class ModelTrainer:
         summary_loss = LossCounter()
         t = time.time()
         for step, (images, targets) in enumerate(val_loader):
-            if self.verbose and step % self.verbose_step == 0:
+            if self.verbose and step and step % self.verbose_step == 0:
                 self._print_line(summary_loss, step, len(val_loader), "Val", t)
             with torch.no_grad():
                 images = torch.stack(images)
@@ -167,7 +167,7 @@ class ModelTrainer:
         summary_loss = LossCounter()
         t = time.time()
         for step, (images, targets) in enumerate(train_loader):
-            if self.verbose and step % self.verbose_step == 0:
+            if self.verbose and step and step % self.verbose_step == 0:
                 self._print_line(summary_loss, step, len(train_loader), "Train", t)
 
             images = torch.stack(images)

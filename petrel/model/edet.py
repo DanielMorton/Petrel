@@ -1,3 +1,4 @@
+import torch
 from effdet import get_efficientdet_config, EfficientDet, DetBenchTrain, DetBenchPredict
 
 
@@ -7,7 +8,7 @@ def load_edet(config_name,
               num_classes=1,
               max_det_per_image=1000,
               soft_nms=False,
-              device=None,
+              device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
               train=True):
     """
     Loads the EfficientDet model with the given config name, input size, and output classes.
@@ -20,7 +21,7 @@ def load_edet(config_name,
     :param num_classes: Number of prediction classes.
     :param max_det_per_image: Maximum number of detection regions to predict.
     :param soft_nms: Use soft non-max suppression. Defaults to False as soft nms is very slow.
-    :param device: Device to load the model on. CPU or CUDA. Defaults to None, equivalent to CPU
+    :param device: Device to load the model on. CPU or CUDA. Defaults using CUDA if available, otherwise CPU
     :param train: Is the model being trained. Defaults to True
     :return: EfficientDet model.
     """
