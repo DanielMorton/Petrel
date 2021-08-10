@@ -1,5 +1,5 @@
 import torch
-from effdet import get_efficientdet_config, EfficientDet, DetBenchTrain, DetBenchPredict
+from effdet import get_efficientdet_config, create_model_from_config
 
 
 def load_edet(config_name,
@@ -32,15 +32,11 @@ def load_edet(config_name,
         config.image_size = image_size
     config.max_det_per_image = max_det_per_image
     config.soft_nms = soft_nms
-    config.num_classes = num_classes
-    model = EfficientDet(config, pretrained_backbone=pretrained_backbone)
-
-    if train:
-        model = DetBenchTrain(model)
-        model.train()
-    else:
-        model = DetBenchPredict(model)
-        model.eval()
+    model = create_model_from_config(config, pretrained=True,
+                                     bench_task="train" if train else "predict",
+                                     max_det_per_image=max_det_per_image,
+                                     num_classes=num_classes,
+                                     soft_nms=soft_nms)
     if device:
         model = model.to(device)
 
