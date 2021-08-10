@@ -1,5 +1,4 @@
-from petrel.model.edet import load_edet
-from petrel.model.optimizer import load_optimizer
+from petrel.model import load_edet, load_optimizer
 from torch.optim import Adam, AdamW, RMSprop, SGD
 
 from unittest import TestCase

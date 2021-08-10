@@ -1,5 +1,5 @@
 from unittest import TestCase
-from petrel.model.counter import AvgCounter
+from petrel.model import AvgCounter
 
 
 class TestEnet(TestCase):

@@ -1,8 +1,6 @@
 import numpy as np
 
-from petrel.model.edet import load_edet
-from petrel.model.optimizer import load_optimizer
-from petrel.model.scheduler import load_scheduler
+from petrel.model import load_edet, load_optimizer, load_scheduler
 
 from unittest import TestCase
 

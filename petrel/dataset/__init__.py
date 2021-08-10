@@ -2,6 +2,8 @@ import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 
 from .petrel import PetrelDataset
+from .train_data import TrainDataset
+from .val_data import ValDataset
 
 BBOX = A.BboxParams(
     format='pascal_voc',

@@ -1,7 +1,7 @@
 from effdet.bench import DetBenchPredict, DetBenchTrain
 from unittest import TestCase
 
-from petrel.model.edet import load_edet
+from petrel.model import load_edet
 
 
 class TestEnet(TestCase):
