@@ -4,7 +4,6 @@ from effdet import get_efficientdet_config, create_model_from_config
 
 def load_edet(config_name,
               image_size,
-              pretrained_backbone=True,
               num_classes=1,
               max_det_per_image=1000,
               soft_nms=False,
@@ -17,7 +16,6 @@ def load_edet(config_name,
 
     :param config_name: Name of the mdoel to load.
     :param image_size: Size the input images.
-    :param pretrained_backbone: Load pretrained weights. Defaults to true.
     :param num_classes: Number of prediction classes.
     :param max_det_per_image: Maximum number of detection regions to predict.
     :param soft_nms: Use soft non-max suppression. Defaults to False as soft nms is very slow.
