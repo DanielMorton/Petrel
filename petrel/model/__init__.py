@@ -1,4 +1,3 @@
-
 from .counter import AvgCounter
 from .edet import load_edet
 from .loss import LossCounter

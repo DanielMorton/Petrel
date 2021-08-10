@@ -1,4 +1,4 @@
-from counter import AvgCounter
+from . import AvgCounter
 
 
 class LossCounter:
