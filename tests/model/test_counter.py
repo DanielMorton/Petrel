@@ -2,7 +2,7 @@ from unittest import TestCase
 from petrel.model import AvgCounter
 
 
-class TestEnet(TestCase):
+class TestCounter(TestCase):
     def test_counter(self):
         avg_counter = AvgCounter()
         avg_counter.update(2, 1)

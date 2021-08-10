@@ -8,6 +8,7 @@ class ModelTrainer:
     """
     Class to train object detection models
     """
+
     def __init__(self, model,
                  optimizer,
                  scheduler,
@@ -61,6 +62,26 @@ class ModelTrainer:
         self.log("Epoch, Stage, Summary Loss, Class Loss, Box Loss", print_line=False)
 
     @staticmethod
+    def _csv_line(summary_loss, epoch, stage):
+        """
+        Builds the string for one line of logging to csv file.
+
+        :param summary_loss: Total current loss
+        :param epoch: Current epoch
+        :param stage: Training or Validation
+        :return: String to write to log file.
+        """
+        return f"{epoch}, {stage}, {summary_loss.avg:.5f}," + \
+               f"{summary_loss.class_avg:.5f}," + \
+               f"{summary_loss.box_avg:.5f},"
+
+    @staticmethod
+    def _output_dict(output):
+        return {"loss": output["loss"].detach().item(),
+                "class_loss": output["class_loss"].detach().item(),
+                "box_loss": output["box_loss"].detach().item()}
+
+    @staticmethod
     def _print_line(summary_loss, step, total_steps, stage, t):
         """
         Prints a line of output showing the current status of training.
@@ -76,21 +97,7 @@ class ModelTrainer:
             f"summary_loss: {summary_loss.avg:.5f}, " +
             f"class_loss: {summary_loss.class_avg:.5f}, " +
             f"box_loss: {summary_loss.box_avg:.5f}, " +
-            f"time: {(time.time() - t):.5f}")
-
-    @staticmethod
-    def _csv_line(summary_loss, epoch, stage):
-        """
-        Builds the string for one line of logging to csv file.
-
-        :param summary_loss: Total current loss
-        :param epoch: Current epoch
-        :param stage: Training or Validation
-        :return: String to write to log file.
-        """
-        return f"{epoch}, {stage}, {summary_loss.avg:.5f}," + \
-               f"{summary_loss.class_avg:.5f}," + \
-               f"{summary_loss.box_avg:.5f},"
+            f"time: {(time.time() - t):.5f}\n")
 
     def fit(self, train_loader, validation_loader):
         """
@@ -128,33 +135,45 @@ class ModelTrainer:
             if self.scheduler:
                 self.scheduler.step()
 
-    def validate(self, val_loader):
+    def load(self, path):
         """
-        Evaluates model on validation data after one epoch of training.
+        Loads saved model, including optimizer, scheduler history, and previous best models.
 
-        :param val_loader: Data Loader for validation data.
-        :type val_loader: torch.utils.data.DataLoader
-        :return Total Loss on validation data.
+        :param path: Path of model to load.
+        """
+        checkpoint = torch.load(path)
+        self.model.model.load_state_dict(checkpoint['model_state_dict'])
+        self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+        self.best_summary_loss = checkpoint['best_summary_loss']
+        self.start_epoch = checkpoint['epoch'] + 1
+
+    def log(self, message, print_line=True):
+        """
+        Write data to log.
+        :param message: Message to write.
+        :param print_line: Boolean, print message to stdout. Default True.
+        """
+        if self.verbose and print_line:
+            print(message)
+        with open(self.log_path, 'a+') as logger:
+            logger.write(f'{message}\n')
+
+    def save(self, path, epoch):
+        """
+        Saves model after training epoch.
+
+        :param path: Path of file for saved model
+        :param epoch: Epoch number.
         """
         self.model.eval()
-        summary_loss = LossCounter()
-        t = time.time()
-        for step, (images, targets) in enumerate(val_loader):
-            if self.verbose and step and step % self.verbose_step == 0:
-                self._print_line(summary_loss, step, len(val_loader), "Val", t)
-            with torch.no_grad():
-                images = torch.stack(images)
-                batch_size = images.shape[0]
-                images = images.to(self.device).float()
-                boxes = [target['bboxes'].to(self.device).float() for target in targets]
-                labels = [target['labels'].to(self.device).float() for target in targets]
-
-                output = self.model(images, {'bbox': boxes, 'cls': labels,
-                                             "img_scale": None,
-                                             "img_size": None})
-                summary_loss.update(output, batch_size)
-
-        return summary_loss
+        torch.save({
+            'model_state_dict': self.model.model.state_dict(),
+            'optimizer_state_dict': self.optimizer.state_dict(),
+            'scheduler_state_dict': self.scheduler.state_dict(),
+            'best_summary_loss': self.best_summary_loss,
+            'epoch': epoch,
+        }, path)
 
     def train(self, train_loader):
         """
@@ -182,48 +201,36 @@ class ModelTrainer:
 
             output['loss'].backward()
 
-            summary_loss.update(output, batch_size)
+            summary_loss.update(self._output_dict(output), batch_size)
 
             self.optimizer.step()
 
         return summary_loss
 
-    def save(self, path, epoch):
+    def validate(self, val_loader):
         """
-        Saves model after training epoch.
+        Evaluates model on validation data after one epoch of training.
 
-        :param path: Path of file for saved model
-        :param epoch: Epoch number.
+        :param val_loader: Data Loader for validation data.
+        :type val_loader: torch.utils.data.DataLoader
+        :return Total Loss on validation data.
         """
         self.model.eval()
-        torch.save({
-            'model_state_dict': self.model.model.state_dict(),
-            'optimizer_state_dict': self.optimizer.state_dict(),
-            'scheduler_state_dict': self.scheduler.state_dict(),
-            'best_summary_loss': self.best_summary_loss,
-            'epoch': epoch,
-        }, path)
+        summary_loss = LossCounter()
+        t = time.time()
+        for step, (images, targets) in enumerate(val_loader):
+            if self.verbose and step and step % self.verbose_step == 0:
+                self._print_line(summary_loss, step, len(val_loader), "Val", t)
+            with torch.no_grad():
+                images = torch.stack(images)
+                batch_size = images.shape[0]
+                images = images.to(self.device).float()
+                boxes = [target['bboxes'].to(self.device).float() for target in targets]
+                labels = [target['labels'].to(self.device).float() for target in targets]
 
-    def load(self, path):
-        """
-        Loads saved model, including optimizer, scheduler history, and previous best models.
+                output = self.model(images, {'bbox': boxes, 'cls': labels,
+                                             "img_scale": None,
+                                             "img_size": None})
+                summary_loss.update(self._output_dict(output), batch_size)
 
-        :param path: Path of model to load.
-        """
-        checkpoint = torch.load(path)
-        self.model.model.load_state_dict(checkpoint['model_state_dict'])
-        self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-        self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-        self.best_summary_loss = checkpoint['best_summary_loss']
-        self.start_epoch = checkpoint['epoch'] + 1
-
-    def log(self, message, print_line=True):
-        """
-        Write data to log.
-        :param message: Message to write.
-        :param print_line: Boolean, print message to stdout. Default True.
-        """
-        if self.verbose and print_line:
-            print(message)
-        with open(self.log_path, 'a+') as logger:
-            logger.write(f'{message}\n')
+        return summary_loss

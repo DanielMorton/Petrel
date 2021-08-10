@@ -59,18 +59,24 @@ class LossCounter:
         """
         return self._loss
 
-    def update(self, output, batch_size=1, avg=False):
+    def update(self, output, batch_size=1):
         """
-        Updates the loss counters after a forward pass of a batch of data.
+        Updates the loss counters after a forward pass of a batch of data. Assumes the update values
+        are the sums of the update values for the individual batches.
         :param output: The output of the forwrd pass.
         :param batch_size: The batch size of the forward pass.
-        :param avg: Are the values in output averages or sums. Defaults to False for sums.
         """
-        if avg:
-            self._loss.update_avg(output["loss"].detach().item(), batch_size)
-            self._class_loss.update_avg(output["class_loss"].detach().item(), batch_size)
-            self._box_loss.update_avg(output["box_loss"].detach().item(), batch_size)
-        else:
-            self._loss.update(output["loss"].detach().item(), batch_size)
-            self._class_loss.update(output["class_loss"].detach().item(), batch_size)
-            self._box_loss.update(output["box_loss"].detach().item(), batch_size)
+        self._loss.update(output["loss"], batch_size)
+        self._class_loss.update(output["class_loss"], batch_size)
+        self._box_loss.update(output["box_loss"], batch_size)
+
+    def  update_avg(self, output, batch_size=1):
+        """
+        Updates the loss counters after a forward pass of a batch of data. Assumes the update values
+        are the averages of the update values for the individual batches.
+        :param output: The output of the forwrd pass.
+        :param batch_size: The batch size of the forward pass.
+        """
+        self._loss.update_avg(output["loss"], batch_size)
+        self._class_loss.update_avg(output["class_loss"], batch_size)
+        self._box_loss.update_avg(output["box_loss"], batch_size)
