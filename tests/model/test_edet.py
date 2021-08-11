@@ -82,3 +82,16 @@ class TestEnet(TestCase):
         assert model.max_detection_points == 5000
         assert not model.soft_nms
         assert model.__class__ == DetBenchPredict
+
+    def test_checkout(self):
+        model = load_edet(config_name="tf_efficientdet_d1",
+                          image_size=(640, 640),
+                          num_classes=90,
+                          checkout_path="tests/tf_efficientdet_d1_40-a30f94af.pth",
+                          train=True)
+        assert model.num_classes == 90
+        assert model.num_levels == 5
+        assert model.max_det_per_image == 1000
+        assert model.max_detection_points == 5000
+        assert not model.soft_nms
+        assert model.__class__ == DetBenchTrain

@@ -4,6 +4,7 @@ from effdet import get_efficientdet_config, create_model_from_config
 
 def load_edet(config_name,
               image_size,
+              checkout_path=None,
               num_classes=1,
               max_det_per_image=1000,
               soft_nms=False,
@@ -16,6 +17,7 @@ def load_edet(config_name,
 
     :param config_name: Name of the mdoel to load.
     :param image_size: Size the input images.
+    :param checkout_path: Option path for loading model weights.
     :param num_classes: Number of prediction classes.
     :param max_det_per_image: Maximum number of detection regions to predict.
     :param soft_nms: Use soft non-max suppression. Defaults to False as soft nms is very slow.
@@ -30,11 +32,13 @@ def load_edet(config_name,
         config.image_size = image_size
     config.max_det_per_image = max_det_per_image
     config.soft_nms = soft_nms
-    model = create_model_from_config(config, pretrained=True,
+    pretrained = False if checkout_path else True
+    model = create_model_from_config(config, pretrained=pretrained,
                                      bench_task="train" if train else "predict",
                                      max_det_per_image=max_det_per_image,
                                      num_classes=num_classes,
                                      soft_nms=soft_nms,
+                                     checkpoint_path=checkout_path if checkout_path else "",
                                      bench_labeler=True)
     if device:
         model = model.to(device)
