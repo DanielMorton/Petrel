@@ -2,7 +2,7 @@ import pandas as pd
 import torch
 
 
-def make_prediction(model, images, targets=None):
+def prediction(model, images, targets=None):
     """
     Makes and stores predictions on one batch of images.
     :param model: The model used for prediction.
@@ -23,12 +23,12 @@ def make_prediction(model, images, targets=None):
             predictions["pred_boxes"].append(pred_det[:, :4].detach().cpu().numpy())
             predictions["pred_scores"].append(pred_det[:, 4].detach().cpu().numpy())
             predictions["pred_labels"].append(pred_det[:, 5].detach().cpu().numpy().astype(int))
-    return pd.DataFrame(predictions)
+    return predictions
 
 
-def make_prediction_df(model, test_loader,
-                       device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
-                       verbose=0):
+def prediction_df(model, test_loader,
+                  device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
+                  verbose=0):
     """
     Creates a Dataframe of predictions from unlabeled test data.
     :param model: The model used for predictions.
@@ -43,16 +43,16 @@ def make_prediction_df(model, test_loader,
     for images in test_loader:
         n += 1
         images = torch.stack(images).to(device).float()
-        predictions.append(make_prediction(model, images))
+        predictions.append(pd.DataFrame(prediction(model, images)))
         if verbose and n % verbose == 0:
             print(f"Processed batch {n}.")
 
     return pd.concat(predictions).reset_index(drop=True)
 
 
-def make_val_prediction_df(model, test_loader,
-                           device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
-                           verbose=0):
+def val_prediction_df(model, test_loader,
+                      device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
+                      verbose=0):
     """
     Creates a Dataframe of predictions from labeled data.
     :param model: The model used for predictions.
@@ -67,7 +67,7 @@ def make_val_prediction_df(model, test_loader,
     for images, labels in test_loader:
         n += 1
         images = torch.stack(images).to(device).float()
-        predictions.append(make_prediction(model, images, labels))
+        predictions.append(pd.DataFrame(prediction(model, images, labels)))
         if verbose and n % verbose == 0:
             print(f"Processed batch {n}.")
 

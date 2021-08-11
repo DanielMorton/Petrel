@@ -3,7 +3,7 @@ import pandas as pd
 from effdet.evaluation.detection_evaluator import PascalDetectionEvaluator
 
 
-def eval(pred, categories, ious=np.round(np.arange(0.5, 1.0, 0.05), 2)):
+def model_eval(pred, categories, ious=np.round(np.arange(0.5, 1.0, 0.05), 2)):
     """
     Evaluates mAP scores at various IOU thresholds. Returns DataFrame of mAP scores for each threshold,
     label and the unweighted average of label mAPs.

@@ -1,2 +1,2 @@
-from .eval import eval
-from .predict import make_prediction, make_prediction_df, make_val_prediction_df
+from .eval import model_eval
+from .predict import prediction, prediction_df, val_prediction_df

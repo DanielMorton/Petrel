@@ -27,7 +27,10 @@ included in this table, but is not used by this package.
 
 Ensure that the indices for ```metadata``` range from `0` to `numrows - 1`.
 
-A sample table with the minimum recommended columns is below.
+A sample table with the minimum recommended columns is below. This data
+comes from [NABirds](https://dl.allaboutbirds.org/nabirds); the file
+name consists of the species level directory number (encoded elsewhere)
+and the random hex string identifying the image file.
 
 |  | file | height | width|
 | --- | :---: | :---: | :---: |
@@ -56,15 +59,18 @@ A seventh column containing class names, to go with the `label` column,
 is useful, but not required. Other columns can be added as the user
 requires.
 
-A sample table is below.
+A sample table, this time from the
+[Sweden Larch Casebearer](http://lila.science/datasets/forest-damages-larch-casebearer/) 
+dataset is below. In this table `damage` is the class name
+corresponding to the label.
 
-|  | file | labels | xmin | ymin | xmax | ymax |
-| --- | :---: | :---: | :---: | :---: | :---: |:---: |
-| 0	| 0645/0001afd499a14a67b940d419413e23b3.jpg	| 4	| 307 | 179	| 799 | 403 | 
-| 1	| 0900/0007181fa7274481ad89591200c61b9d.jpg	| 22 | 47 |194 | 866 | 767 | 
-| 2	| 0988/00071e2081564bd8b5ca6445c2560ee5.jpg	| 22 | 260 | 146 | 838 | 662 | 
-| 3	| 0845/00081fce2a744a9fb52b9bb8871a48e2.jpg	| 22 | 259 | 143 | 915 | 682 | 
-| 4	| 0698/00085a7befcc4c08a83038477e749101.jpg	| 1	| 217 | 174	| 898 | 401|
+|  | file | damage | labels	| xmin | ymin | xmax | ymax |
+| --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 0	| Jallasvag_20190527/Images/B03_0002.JPG | HD | 2 | 205	| 288 | 297 | 380 |
+| 1	| Jallasvag_20190527/Images/B03_0002.JPG | HD | 2 | 276	| 186 | 425 | 399 |
+| 2 | Kampe_20190527/Images/B04_0053.JPG | LD | 3 | 287 | 817 | 474 | 1017 |
+| 3 | Kampe_20190527/Images/B04_0130.JPG | HD | 2 | 537 | 301 | 641	| 411 | 
+| 4 | Kampe_20190527/Images/B04_0115.JPG | H  | 1 | 1361 | 567 |1455 | 651 |
 
 
 ## Preparing Training and Validation Data
@@ -83,16 +89,91 @@ preprocessing steps are run again. If this fails after a certain number
 of attempts another set of transformations (which may or may not be
 the same) is done once in its place. ```TrainDataset``` is designed to
 be used with [Albumentations](https://albumentations.ai) chained
-together by ```Compose```, but could work with another package with a
+together by `Compose`, but could work with another package with a
 similar API.
 
 Since validation requires the same images for each epoch
-```ValDataset``` only performs one transformation operation.
+ValDataset` only performs one transformation operation.
 
 Users are expected to provide their own transformation functions as
 this is the part of model training that is most dependent on the
 dataset in use. A sample transformation that only reshapes images to
-a fixed six is provided in ```dataset/___init__.py```.
+a fixed size is provided in `dataset/___init__.py`
 
+A sample `TrainDataset` and `ValDataset` is construction is shown below.
 
+```python
+train_dataset = TrainDataset(
+    meta_data=TRAINING_METADATA,
+    boxes=TRAINING_BOXES,
+    image_root=f"{TRAIN_IMG_ROOT_DIR}",
+    transform=TRAIN_TRANSFORM
+)
+
+val_dataset = ValDataset(
+    meta_data=VAL_METADATA,
+    boxes=VAL_BOXES,
+    image_root=f"{VAL_IMG_ROOT_DIR}",
+    transform=VAL_TRANSFORM,
+    train_pipe=True #Set to false if not used for training.
+)
+```
+
+Setting up and training a model is even simpler.
+
+```python
+model = load_edet(
+    "tf_efficientdet_d0",
+    image_size=512,
+    num_classes=4
+)
+optimizer = load_optimizer(
+    "adamw",
+    model,
+    learning_rate=2.56e-3
+)
+scheduler = load_scheduler(
+    "exponential",
+    optimizer=optimizer,
+    gamma=0.94**0.25
+)
+model_trainer = ModelTrainer(
+    model,
+    optimizer,
+    scheduler,
+    base_dir=f"{BASE_MODEL_DIR}"
+)
+```
+
+## Prediction and Evaluation
+
+The ```predict``` module contains code for conputing predictions for
+single batches, which can be size `1`, or whole datasets.
+The `predict` function takes an image and an optional dictionary
+of bounding boxes and labels and returns a dictionary of bounding
+box predictions. When a full batch job is required, `predict_df` or
+`val_predict_df` can be used depending on whether ground truth data
+is available.
+
+The ```eval``` module computes evaluation metrics. For a range of IOU
+match thresholds, defaulting to the COCO standard `0.50:0.05:0.95`,
+`eval` computes the PASCAL-VOC mAP for each class and an unweighted
+average mAP over all classes. These can then be averaged over the IOU
+thresholds to approximate the COCO mAP (COCO mAP averages over 
+regular recall values `0.01:0.01:0.99` while PASCAL-VOC mAP is a
+continous integral over recall values; the difference will be slight.)
+
+Below is an example of evaluating a model on a dataset.
+
+```python
+model = load_edet(
+    "tf_efficientdet_d0",
+    image_size=512,
+    num_classes=4,
+    checkpoint_path=f"{BASE_MODEL_DIR}",
+    train=False)
+
+pred_df = make_val_prediction_df(model, val_loader, verbose=20)
+eval_df = model_eval(pred_df, categories=categories)
+```
 
