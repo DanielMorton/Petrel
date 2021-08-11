@@ -12,7 +12,7 @@ def load_edet(config_name,
               train=True):
     """
     Loads the EfficientDet model with the given config name, input size, and output classes.
-    Can load models with or without pretrained weights. The latter case is for loading a model with custom weights
+    Can load models with COCO pretrained weights or user-defined model weights.
 
 
     :param config_name: Name of the mdoel to load.
