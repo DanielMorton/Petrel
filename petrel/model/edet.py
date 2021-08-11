@@ -34,7 +34,8 @@ def load_edet(config_name,
                                      bench_task="train" if train else "predict",
                                      max_det_per_image=max_det_per_image,
                                      num_classes=num_classes,
-                                     soft_nms=soft_nms)
+                                     soft_nms=soft_nms,
+                                     bench_labeler=True)
     if device:
         model = model.to(device)
 
