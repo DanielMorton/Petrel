@@ -37,7 +37,7 @@ def make_prediction_df(model, test_loader, verbose=0):
     assert verbose >= 0
     predictions = []
     n = 0
-    for images, labels in test_loader:
+    for images in test_loader:
         n += 1
         images = torch.stack(images).cuda().float()
         predictions.append(make_prediction(model, images, labels))
@@ -58,7 +58,7 @@ def make_val_prediction_df(model, test_loader, verbose=0):
     assert verbose >= 0
     predictions = []
     n = 0
-    for images in test_loader:
+    for images, labels in test_loader:
         n += 1
         images = torch.stack(images).cuda().float()
         predictions.append(make_prediction(model, images))

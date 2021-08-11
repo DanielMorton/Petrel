@@ -142,11 +142,11 @@ class ModelTrainer:
         :param path: Path of model to load.
         """
         checkpoint = torch.load(path)
-        self.model.model.load_state_dict(checkpoint['model_state_dict'])
-        self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-        self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-        self.best_summary_loss = checkpoint['best_summary_loss']
-        self.start_epoch = checkpoint['epoch'] + 1
+        self.model.model.load_state_dict(checkpoint["state_dict"])
+        self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        self.scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+        self.best_summary_loss = checkpoint["best_summary_loss"]
+        self.start_epoch = checkpoint["epoch"] + 1
 
     def log(self, message, print_line=True):
         """
@@ -168,11 +168,11 @@ class ModelTrainer:
         """
         self.model.eval()
         torch.save({
-            'model_state_dict': self.model.model.state_dict(),
-            'optimizer_state_dict': self.optimizer.state_dict(),
-            'scheduler_state_dict': self.scheduler.state_dict(),
-            'best_summary_loss': self.best_summary_loss,
-            'epoch': epoch,
+            "state_dict": self.model.model.state_dict(),
+            "optimizer_state_dict": self.optimizer.state_dict(),
+            "scheduler_state_dict": self.scheduler.state_dict(),
+            "best_summary_loss": self.best_summary_loss,
+            "epoch": epoch,
         }, path)
 
     def train(self, train_loader):
