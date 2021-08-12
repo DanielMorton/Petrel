@@ -37,7 +37,7 @@ setup(
 
     # Note that this is a string of words separated by whitespace, not a list.
     packages=find_packages(exclude=["test"]),
-    install_requires=["torch >= 1.9", "effdet >= 0.2.4", "albumentations >= 1.0.3",
-                      "opencv_python_headless >=4.5.2.54"],
+    install_requires=["albumentations >= 1.0.3", "effdet >= 0.2.4",
+                      "opencv_python >=4.5.2.54", "pandas >= 1.1.5", "torch >= 1.9"],
     python_requires=">=3.7",
 )
