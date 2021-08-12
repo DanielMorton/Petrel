@@ -1,4 +1,6 @@
 [![CircleCI](https://circleci.com/gh/DanielMorton/Petrel/tree/master.svg?style=svg)](https://circleci.com/gh/DanielMorton/Petrel/tree/master)
+[![PyPI version](https://badge.fury.io/py/petrel-det.svg)](https://badge.fury.io/py/petrel-det)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/petrel-det.svg)](https://pypi.python.org/pypi/petrel-det/)
 
 # Petrel
 
