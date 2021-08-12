@@ -1,7 +1,6 @@
 [![CircleCI](https://circleci.com/gh/DanielMorton/Petrel/tree/master.svg?style=svg)](https://circleci.com/gh/DanielMorton/Petrel/tree/master)
 
 # Petrel
-Code to streamline Pytorch EfficientDet applications
 
 PyTorch has a very reliable implementation of [EfficientDet](https://github.com/rwightman/efficientdet-pytorch)
 but like all deep learning frameworks it requires a fair amount of work
