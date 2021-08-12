@@ -177,3 +177,28 @@ pred_df = make_val_prediction_df(model, val_loader, verbose=20)
 eval_df = model_eval(pred_df, categories=categories)
 ```
 
+The output of `model_eval` for a simple EfficientDet0 on the Larch
+Casebearer Dataset is shown below.
+
+| IOU Threshold| Precision | H | HD | LD | other |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| 0.50 | 70.74 | 54.01 | 70.91 | 86.00 | 72.06 |
+| 0.55 | 69.66 | 53.69 | 69.73 | 84.94 | 70.29 |
+| 0.60 | 67.72 | 52.65 | 67.83 | 83.20 | 67.19 |
+| 0.65 | 64.78 | 51.01 | 64.51 | 80.51 | 63.09 |
+| 0.70 | 59.55 | 48.56 | 58.37 | 75.33 | 55.94 |
+| 0.75 | 50.14 | 41.72 | 47.21 | 65.74 | 45.87 | 
+| 0.80 | 35.41 | 30.73 | 30.42 | 48.64 | 31.86 |
+| 0.85 | 17.29 | 15.68 | 12.02 | 25.28 | 16.16 |
+| 0.90 |  3.62 |  3.61 |  1.83 |  5.18 |  3.87 |
+| 0.95 |  0.08 |  0.06 |  0.03 |  0.11 |  0.11 |
+
+Average over the IOU Thresholds the (approximate) COCO mAP results are
+
+| Category | mAP |
+| --- | :---: |
+| Precision   | 43.90 |
+| Healthy     | 35.17 |
+| High Damage | 42.29 |
+| Low Damage  | 55.49 |
+| Other       | 42.64 |
