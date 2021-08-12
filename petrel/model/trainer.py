@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import torch
 import time
 from .loss import LossCounter
@@ -44,6 +46,7 @@ class ModelTrainer:
         self.verbose = verbose
         self.verbose_step = verbose_step
         self.keep_models = keep_models
+        self.zfill = np.ceil(np.log10(self.verbose_step)).astype(int)
         if model_file:
             self.load(model_file)
         else:
@@ -122,13 +125,13 @@ class ModelTrainer:
             # Update list of saved models
             if len(self.best_summary_loss) < self.keep_models:
                 self.best_summary_loss.append((summary_loss.avg, epoch))
-                self.save(f'{self.base_dir}/best-checkpoint-{str(epoch).zfill(3)}epoch.bin', epoch)
+                self.save(f'{self.base_dir}/best-checkpoint-{str(epoch).zfill(self.zfill)}epoch.bin', epoch)
                 self.best_summary_loss.sort()
             elif summary_loss.avg < self.best_summary_loss[-1][0]:
                 _, old_epoch = self.best_summary_loss.pop()
                 self.best_summary_loss.append((summary_loss.avg, epoch))
-                self.save(f'{self.base_dir}/best-checkpoint-{str(epoch).zfill(3)}epoch.bin', epoch)
-                os.remove(f'{self.base_dir}/best-checkpoint-{str(old_epoch).zfill(3)}epoch.bin')
+                self.save(f'{self.base_dir}/best-checkpoint-{str(epoch).zfill(self.zfill)}epoch.bin', epoch)
+                os.remove(f'{self.base_dir}/best-checkpoint-{str(old_epoch).zfill(self.zfill)}epoch.bin')
                 self.best_summary_loss.sort()
 
             # Update learning rate.

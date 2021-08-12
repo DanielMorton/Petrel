@@ -40,6 +40,11 @@ def load_edet(config_name,
                                      soft_nms=soft_nms,
                                      checkpoint_path=checkpoint_path if checkpoint_path else "",
                                      bench_labeler=True)
+
+    if train:
+        model.train()
+    else:
+        model.eval()
     if device:
         model = model.to(device)
 
