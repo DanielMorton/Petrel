@@ -8,9 +8,9 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
-exec(open("version.py").read())
+exec(open("petrel/version.py").read())
 setup(
-    name="petrel",
+    name="petrel-det",
     version=__version__,
     description="Code to streamline Pytorch EfficientDet applications",
     long_description=long_description,

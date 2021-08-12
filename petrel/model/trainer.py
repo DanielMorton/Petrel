@@ -109,7 +109,8 @@ class ModelTrainer:
         :param train_loader: Data Loader for training data.
         :param validation_loader: Data Loader for validation data.
         """
-        self._csv_header()
+        if self.start_epoch == 0:
+            self._csv_header()
         for epoch in range(self.start_epoch, self.num_epochs):
             # Train one epoch
             summary_loss = self.train(train_loader)
