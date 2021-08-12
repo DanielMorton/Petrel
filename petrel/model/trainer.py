@@ -166,7 +166,7 @@ class ModelTrainer:
         :param path: Path of file for saved model
         :param epoch: Epoch number.
         """
-        self.model.model_eval()
+        self.model.eval()
         torch.save({
             "state_dict": self.model.model.state_dict(),
             "optimizer_state_dict": self.optimizer.state_dict(),
@@ -215,7 +215,7 @@ class ModelTrainer:
         :type val_loader: torch.utils.data.DataLoader
         :return Total Loss on validation data.
         """
-        self.model.model_eval()
+        self.model.eval()
         summary_loss = LossCounter()
         t = time.time()
         for step, (images, targets) in enumerate(val_loader):
