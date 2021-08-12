@@ -196,7 +196,7 @@ Casebearer Dataset is shown below.
 | 0.90 |  3.62 |  3.61 |  1.83 |  5.18 |  3.87 |
 | 0.95 |  0.08 |  0.06 |  0.03 |  0.11 |  0.11 |
 
-Average over the IOU Thresholds the (approximate) COCO mAP results are
+Averaged over the IOU Thresholds the (approximate) COCO mAP results are
 
 | Category | mAP |
 | --- | :---: |
