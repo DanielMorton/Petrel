@@ -102,6 +102,7 @@ a fixed size is provided in `dataset/___init__.py`
 A sample `TrainDataset` and `ValDataset` is construction is shown below.
 
 ```python
+from petrel.dataset import TrainDataset, ValDataset
 train_dataset = TrainDataset(
     meta_data=TRAINING_METADATA,
     boxes=TRAINING_BOXES,
@@ -121,6 +122,7 @@ val_dataset = ValDataset(
 Setting up and training a model is even simpler.
 
 ```python
+from petrel.model import load_edet, load_optimizer, load_scheduler, ModelTrainer
 model = load_edet(
     "tf_efficientdet_d0",
     image_size=512,
@@ -165,6 +167,8 @@ continous integral over recall values; the difference will be slight.)
 Below is an example of evaluating a model on a dataset.
 
 ```python
+from petrel.model import load_edet
+from petrel.predict import model_eval, val_prediction_df
 model = load_edet(
     "tf_efficientdet_d0",
     image_size=512,
@@ -172,7 +176,7 @@ model = load_edet(
     checkpoint_path=f"{BASE_MODEL_DIR}",
     train=False)
 
-pred_df = make_val_prediction_df(model, val_loader, verbose=20)
+pred_df = val_prediction_df(model, val_loader, verbose=20)
 eval_df = model_eval(pred_df, categories=categories)
 ```
 
