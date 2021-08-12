@@ -76,7 +76,7 @@ class ModelTrainer:
         """
         return f"{epoch}, {stage}, {summary_loss.avg:.5f}," + \
                f"{summary_loss.class_avg:.5f}," + \
-               f"{summary_loss.box_avg:.5f},"
+               f"{summary_loss.box_avg:.5f}"
 
     @staticmethod
     def _output_dict(output):
