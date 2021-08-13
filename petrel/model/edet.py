@@ -1,5 +1,6 @@
 import torch
 from effdet import get_efficientdet_config, create_model_from_config
+from .bench import DetBenchTrainVal
 
 
 def load_edet(config_name,
@@ -9,7 +10,8 @@ def load_edet(config_name,
               max_det_per_image=1000,
               soft_nms=False,
               device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
-              train=True):
+              train=True,
+              detection=False):
     """
     Loads the EfficientDet model with the given config name, input size, and output classes.
     Can load models with COCO pretrained weights or user-defined model weights.
@@ -23,6 +25,7 @@ def load_edet(config_name,
     :param soft_nms: Use soft non-max suppression. Defaults to False as soft nms is very slow.
     :param device: Device to load the model on. CPU or CUDA. Defaults using CUDA if available, otherwise CPU
     :param train: Is the model being trained. Defaults to True
+    :param detection: Return detections during training. This slows down the validation step. Defaults to False.
     :return: EfficientDet model.
     """
     config = get_efficientdet_config(config_name)
@@ -42,6 +45,8 @@ def load_edet(config_name,
                                      bench_labeler=True)
 
     if train:
+        if not detection:
+            model = DetBenchTrainVal(model.model, model.config)
         model.train()
     else:
         model.eval()
