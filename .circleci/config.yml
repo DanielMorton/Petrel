@@ -29,15 +29,15 @@ jobs:
           # This assumes pytest is installed via the install-package step above
           command: pytest
 
-    python37:
-      docker:
-        - image: cimg/python:3.7
-      steps:
-        - checkout
-        - python/install-packages:
-            pkg-manager: pip
-            pip-dependency-file: requirements.txt
-        - run:
-            name: Run tests
-            # This assumes pytest is installed via the install-package step above
-            command: pytest
+  python37:
+    docker:
+      - image: cimg/python:3.7
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+          pip-dependency-file: requirements.txt
+      - run:
+          name: Run tests
+          # This assumes pytest is installed via the install-package step above
+          command: pytest
