@@ -23,7 +23,7 @@ class TestOptimizer(TestCase):
 
     def test_rmsprop(self):
         model = load_edet("tf_efficientdet_d0", image_size=512)
-        optimizer = load_optimizer("rms", model, learning_rate=1e-2)
+        optimizer = load_optimizer("rmsprop", model, learning_rate=1e-2)
         assert optimizer.__class__ == RMSprop
         assert optimizer.param_groups[0]["lr"] == 1e-2
         assert optimizer.param_groups[0]['momentum'] == 0.9

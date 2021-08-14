@@ -2,10 +2,25 @@ from effdet import DetBenchTrain
 
 
 class DetBenchTrainVal(DetBenchTrain):
+    """
+    Wrapper class around DetBenchTrain to override the forward method. DetBenchTrain computes detection on
+    validation, which slows down the validation portion of the a training pipeline and is not always desirable.
+    This module allows validation to be evaluated purely by the loss functions.
+    """
     def __init__(self, model, config):
+        """
+        :param model: EfficientDet model to train.
+        :param config: Model configuration dictionary.
+        """
         super(DetBenchTrainVal, self).__init__(model, config)
 
     def forward(self, x, target):
+        """
+        Performs forward propagation on a batch.
+        :param x: Batch of images.
+        :param target: Batch of bounding box labels.
+        :return: Output dictionary consisting of total loss, class loss, and box loss.
+        """
         class_out, box_out = self.model(x)
         if self.anchor_labeler is None:
             # target should contain pre-computed anchor labels if labeler not present in bench
