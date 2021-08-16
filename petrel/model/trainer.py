@@ -46,7 +46,7 @@ class ModelTrainer:
         self.verbose = verbose
         self.verbose_step = verbose_step
         self.keep_models = keep_models
-        self.zfill = np.ceil(np.log10(self.verbose_step)).astype(int)
+        self.zfill = np.ceil(np.log10(self.num_epochs)).astype(int)
         if model_file:
             self.load(model_file)
         else:
