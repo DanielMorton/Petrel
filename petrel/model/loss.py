@@ -70,7 +70,7 @@ class LossCounter:
         self._class_loss.update(output["class_loss"], batch_size)
         self._box_loss.update(output["box_loss"], batch_size)
 
-    def  update_avg(self, output, batch_size=1):
+    def update_avg(self, output, batch_size=1):
         """
         Updates the loss counters after a forward pass of a batch of data. Assumes the update values
         are the averages of the update values for the individual batches.
