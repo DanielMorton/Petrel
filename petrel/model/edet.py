@@ -11,7 +11,9 @@ def load_edet(config_name,
               soft_nms=False,
               device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
               train=True,
-              detection=False):
+              detection=False,
+              alpha=None,
+              gamma=None):
     """
     Loads the EfficientDet model with the given config name, input size, and output classes.
     Can load models with COCO pretrained weights or user-defined model weights.
@@ -26,6 +28,8 @@ def load_edet(config_name,
     :param device: Device to load the model on. CPU or CUDA. Defaults using CUDA if available, otherwise CPU
     :param train: Is the model being trained. Defaults to True
     :param detection: Return detections during training. This slows down the validation step. Defaults to False.
+    :param alpha: Optional parameter to adjust focal loss alpha.
+    :param gamma: Optional parameter to adjust focal loss gamma.
     :return: EfficientDet model.
     """
     config = get_efficientdet_config(config_name)
@@ -35,6 +39,10 @@ def load_edet(config_name,
         config.image_size = image_size
     config.max_det_per_image = max_det_per_image
     config.soft_nms = soft_nms
+    if alpha:
+        config.alpha = alpha
+    if gamma:
+        config.gamma = gamma
     pretrained = False if checkpoint_path else True
     model = create_model_from_config(config, pretrained=pretrained,
                                      bench_task="train" if train else "predict",
