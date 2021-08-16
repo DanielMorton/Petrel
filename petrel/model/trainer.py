@@ -205,7 +205,7 @@ class ModelTrainer:
 
             output['loss'].backward()
 
-            summary_loss.update(self._output_dict(output), batch_size)
+            summary_loss.update_avg(self._output_dict(output), batch_size)
 
             self.optimizer.step()
 
@@ -235,6 +235,6 @@ class ModelTrainer:
                 output = self.model(images, {'bbox': boxes, 'cls': labels,
                                              "img_scale": None,
                                              "img_size": None})
-                summary_loss.update(self._output_dict(output), batch_size)
+                summary_loss.update_avg(self._output_dict(output), batch_size)
 
         return summary_loss
